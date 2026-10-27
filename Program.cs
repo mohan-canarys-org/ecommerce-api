@@ -41,6 +41,11 @@ public class Program
                     app.UseEndpoints(endpoints =>
                     {
                         endpoints.MapControllers();
+                        endpoints.MapGet("/", context =>
+                        {
+                            context.Response.Redirect("/swagger");
+                            return Task.CompletedTask;
+                        });
                     });
                     var customerService = app.ApplicationServices.GetRequiredService<CustomerService>();
                     var orderService = app.ApplicationServices.GetRequiredService<OrderService>();
