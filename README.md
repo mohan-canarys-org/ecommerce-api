@@ -56,6 +56,10 @@ http://localhost:5000/swagger
 
 The application includes a `MockDataInitializer` class that seeds the database with mock data for testing purposes. This can be useful for development and testing without needing a real database setup.
 
+## Logging
+
+The application writes log entries, including HTTP request outcomes and unhandled request exceptions, to daily text files in the `Logs` directory under the application's working directory. Files are named `application-yyyy-MM-dd.txt` and append entries for the current day.
+
 ## Contributing
 
 Contributions are welcome! Please feel free to submit a pull request or open an issue for any suggestions or improvements.

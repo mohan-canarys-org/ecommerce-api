@@ -1,9 +1,12 @@
+using System.Diagnostics;
 using ecommerce_api.Data;
+using ecommerce_api.Logging;
 using ecommerce_api.Services;
 using Microsoft.AspNetCore.Builder;
 using Microsoft.AspNetCore.Hosting;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Hosting;
+using Microsoft.Extensions.Logging;
 using Microsoft.OpenApi.Models;
 
 public class Program
@@ -15,6 +18,10 @@ public class Program
 
     public static IHostBuilder CreateHostBuilder(string[] args) =>
         Host.CreateDefaultBuilder(args)
+            .ConfigureLogging(logging =>
+            {
+                logging.AddProvider(new DailyFileLoggerProvider());
+            })
             .ConfigureWebHostDefaults(webBuilder =>
             {
                 webBuilder.ConfigureServices((context, services) =>
@@ -36,6 +43,31 @@ public class Program
                     {
                         app.UseDeveloperExceptionPage();
                     }
+                    app.Use(async (context, next) =>
+                    {
+                        var logger = context.RequestServices.GetRequiredService<ILogger<Program>>();
+                        var stopwatch = Stopwatch.StartNew();
+                        try
+                        {
+                            await next();
+                            logger.LogInformation(
+                                "HTTP {Method} {Path} responded {StatusCode} in {ElapsedMilliseconds} ms",
+                                context.Request.Method,
+                                context.Request.Path,
+                                context.Response.StatusCode,
+                                stopwatch.ElapsedMilliseconds);
+                        }
+                        catch (Exception exception)
+                        {
+                            logger.LogError(
+                                exception,
+                                "HTTP {Method} {Path} failed after {ElapsedMilliseconds} ms",
+                                context.Request.Method,
+                                context.Request.Path,
+                                stopwatch.ElapsedMilliseconds);
+                            throw;
+                        }
+                    });
                     app.UseRouting();
                     app.UseAuthorization();
                     app.UseEndpoints(endpoints =>
