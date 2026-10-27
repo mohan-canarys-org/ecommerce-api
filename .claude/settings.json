@@ -1,0 +1,15 @@
+{
+  "hooks": {
+    "PreToolUse": [
+      {
+        "hooks": [
+          {
+            "command": "cmd /c \"entire-brain hook pre-edit --claude-hook || entire brain hook pre-edit --claude-hook || exit /b 0\"",
+            "type": "command"
+          }
+        ],
+        "matcher": "Edit|Write|MultiEdit|NotebookEdit"
+      }
+    ]
+  }
+}
